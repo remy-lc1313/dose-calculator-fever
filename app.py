@@ -40,26 +40,27 @@ st.markdown("""
             color: #475569; /* Slate Gray */
         }
         
-        /* --- FONT SIZE & READABILITY IMPROVEMENTS --- */
+        /* --- FONT SIZE & READABILITY IMPROVEMENTS (STABLE SELECTORS) --- */
 
         /* Increase font size for all input widget labels */
-        .st-emotion-cache-1jrvg6t {
+        div[data-testid="stWidgetLabel"] p {
              font-size: 1.1rem;
              color: #334155;
+             font-weight: 600;
         }
         
         /* Increase font size for text inside selectbox */
-        .stSelectbox div[data-baseweb="select"] > div {
+        div[data-testid="stSelectbox"] div {
              font-size: 1.1rem;
         }
 
         /* Increase font size for text inside radio buttons */
-        .stRadio label {
+        div[data-testid="stRadio"] label {
              font-size: 1.05rem;
         }
         
         /* Increase font size for number input */
-        .stNumberInput input {
+        div[data-testid="stNumberInput"] input {
              font-size: 1.1rem;
         }
         
@@ -113,15 +114,14 @@ with col2:
 
 
 # --- Medication Selection Tabs ---
-# Use a callback to track the active tab
-def on_tab_change():
-    st.session_state.active_tab = st.session_state.tabs
-
-tabs = st.tabs(["Ibuprofen", "Acetaminophen"])
-if "active_tab" not in st.session_state:
+# Use session state to track the active tab robustly
+if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "Ibuprofen"
 
+tabs = st.tabs(["Ibuprofen", "Acetaminophen"])
+
 with tabs[0]: # Ibuprofen
+    st.session_state.active_tab = "Ibuprofen"
     age_range = st.radio(
         "Child's Age",
         ["> 6 months", "≤ 6 months"],
@@ -133,24 +133,21 @@ with tabs[0]: # Ibuprofen
         ["Children's Liquid (100 mg / 5 mL)", "Infant Drops (200 mg / 5 mL)"],
         key='ibu_form'
     )
-    if st.session_state.active_tab != "Ibuprofen":
-        st.session_state.active_tab = "Ibuprofen"
-
 
 with tabs[1]: # Acetaminophen
+    st.session_state.active_tab = "Acetaminophen"
     ace_formulation_option = st.selectbox(
         "Acetaminophen Formulation",
         ["Children's Liquid (160 mg / 5 mL)", "Infant Drops (80 mg / 1 mL)"],
         key='ace_form'
     )
-    if st.session_state.active_tab != "Acetaminophen":
-        st.session_state.active_tab = "Acetaminophen"
 
 
 # --- Calculation Logic & Display ---
 if st.button("Calculate Dose", use_container_width=True):
     # Determine which medication is active based on the last known state of the tabs
-    active_med = st.session_state.get('active_tab', 'Ibuprofen')
+    # We need to re-read the state inside the button press
+    active_tab_on_click = st.session_state.get('active_tab', 'Ibuprofen')
     
     if not weight or weight <= 0:
         st.error("Please enter a valid weight.")
@@ -159,13 +156,23 @@ if st.button("Calculate Dose", use_container_width=True):
         
         total_mg, total_ml, timing, dose_rate, med_name, concentration_text = 0, 0, "", 0, "", ""
         
+        # A simple hack to re-check which tab is visually active
+        # This part is tricky in Streamlit. We determine active med by what selectbox has a value
+        try:
+            # This will throw an error if the key doesn't exist (because the tab wasn't rendered yet)
+            _ = st.session_state.ace_form 
+            active_med = 'Acetaminophen'
+        except:
+            active_med = 'Ibuprofen'
+
+
         if active_med == 'Ibuprofen':
             med_name = "Ibuprofen"
-            dose_rate = 10 if age_range == '> 6 months' else 5
-            timing = 'every 6 hours' if age_range == '> 6 months' else 'every 8 hours'
+            dose_rate = 10 if st.session_state.ibu_age == '> 6 months' else 5
+            timing = 'every 6 hours' if st.session_state.ibu_age == '> 6 months' else 'every 8 hours'
             
-            concentration_text = "100 mg / 5 mL" if "100 mg / 5 mL" in ibu_formulation_option else "200 mg / 5 mL"
-            concentration = (100 / 5) if "100 mg / 5 mL" in ibu_formulation_option else (200 / 5)
+            concentration_text = "100 mg / 5 mL" if "100 mg / 5 mL" in st.session_state.ibu_form else "200 mg / 5 mL"
+            concentration = (100 / 5) if "100 mg / 5 mL" in st.session_state.ibu_form else (200 / 5)
             
             total_mg = weight_in_kg * dose_rate
             total_ml = total_mg / concentration
@@ -174,8 +181,8 @@ if st.button("Calculate Dose", use_container_width=True):
             dose_rate = 15
             timing = 'every 4 hours'
             
-            concentration_text = "160 mg / 5 mL" if "160 mg / 5 mL" in ace_formulation_option else "80 mg / 1 mL"
-            concentration = (160 / 5) if "160 mg / 5 mL" in ace_formulation_option else (80 / 1)
+            concentration_text = "160 mg / 5 mL" if "160 mg / 5 mL" in st.session_state.ace_form else "80 mg / 1 mL"
+            concentration = (160 / 5) if "160 mg / 5 mL" in st.session_state.ace_form else (80 / 1)
 
             total_mg = weight_in_kg * dose_rate
             total_ml = total_mg / concentration

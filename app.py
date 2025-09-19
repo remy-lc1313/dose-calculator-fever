@@ -7,6 +7,13 @@ st.set_page_config(
     layout="centered"
 )
 
+# --- Custom Home Screen Icon for iPhone ---
+# Corrected the URL to the direct raw link
+st.markdown("""
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/remy-lc1313/dose-calculator-fever/main/icon.svg">
+""", unsafe_allow_html=True)
+
+
 # --- App Header ---
 st.title("Pediatric Dose Calculator")
 st.write("For Ibuprofen and Acetaminophen")
@@ -32,7 +39,7 @@ if medication == "Ibuprofen":
     # Corrected the labels to match the medical chart exactly
     age_range = st.radio(
         "Child's Age",
-        ["Over 6 months", "1 to 6 months"], 
+        ["Over 6 months", "1-6 months"],
         horizontal=True
     )
     formulation_option = st.selectbox(
@@ -75,14 +82,14 @@ if st.button("Calculate Dose", use_container_width=True):
                     else: # '1-6 months'
                         dose_rate = 5
                         timing = 'every 8 hours as needed'
-                    
+
                     if "100 mg / 5 mL" in formulation_option:
                         concentration_text = "100 mg / 5 mL"
                         concentration = 100 / 5
                     else:
                         concentration_text = "200 mg / 5 mL"
                         concentration = 200 / 5
-                
+
                 else: # Acetaminophen
                     dose_rate = 15
                     timing = 'every 4 hours as needed'
@@ -100,7 +107,7 @@ if st.button("Calculate Dose", use_container_width=True):
 
                 # --- Display Result using clean Streamlit components ---
                 st.subheader("Recommended Dose:")
-                
+
                 col1, col2 = st.columns(2)
                 with col1:
                     st.metric(label="Dose (in mg)", value=f"{total_mg:.0f} mg")
@@ -109,7 +116,7 @@ if st.button("Calculate Dose", use_container_width=True):
 
                 st.info(f"Give {timing}.")
                 st.caption(f"Calculation based on: {dose_rate} mg/kg for a child of {weight_in_kg:.1f} kg using {concentration_text} concentration.")
-            
+
     except ValueError:
         st.error("Please enter a valid number for the weight.")
 
@@ -118,9 +125,9 @@ if st.button("Calculate Dose", use_container_width=True):
 st.divider()
 st.warning(
     """
-    **Disclaimer:** This tool is for informational purposes only. 
+    **Disclaimer:** This tool is for informational purposes only.
     Always consult with a qualified healthcare provider for medical advice and before administering any medication.
-    """, 
+    """,
     icon="⚠️"
 )
 

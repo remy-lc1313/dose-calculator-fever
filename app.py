@@ -31,7 +31,7 @@ if medication == "Ibuprofen":
     st.subheader("Ibuprofen Details")
     age_range = st.radio(
         "Child's Age",
-        ["> 6 months", "≤ 6 months"],
+        ["Older than 6 months", "≤ 6 months"],
         horizontal=True
     )
     formulation_option = st.selectbox(

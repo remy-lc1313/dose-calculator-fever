@@ -16,6 +16,7 @@ st.markdown("""
         /* Main background color */
         .stApp {
             background-color: #14b8a6; /* Saturated Teal */
+            font-family: 'Inter', sans-serif; /* Set default font for the whole app */
         }
         
         /* Main container for widgets */
@@ -38,6 +39,32 @@ st.markdown("""
             font-weight: 700;
             color: #475569; /* Slate Gray */
         }
+        
+        /* --- FONT SIZE & READABILITY IMPROVEMENTS --- */
+
+        /* Increase font size for all input widget labels */
+        .st-emotion-cache-1jrvg6t {
+             font-size: 1.1rem;
+             color: #334155;
+        }
+        
+        /* Increase font size for text inside selectbox */
+        .stSelectbox div[data-baseweb="select"] > div {
+             font-size: 1.1rem;
+        }
+
+        /* Increase font size for text inside radio buttons */
+        .stRadio label {
+             font-size: 1.05rem;
+        }
+        
+        /* Increase font size for number input */
+        .stNumberInput input {
+             font-size: 1.1rem;
+        }
+        
+        /* --- END FONT IMPROVEMENTS --- */
+
 
         /* Style for the radio button options to give a colorful feel on selection */
         .stRadio [role="radiogroup"] > label {
@@ -63,6 +90,7 @@ st.markdown("""
             color: white;
             font-weight: bold;
             transition: background-color 0.2s;
+            font-size: 1.1rem; /* Increased font size for button */
         }
         .stButton>button:hover {
             background-color: #0f766e;
@@ -85,10 +113,15 @@ with col2:
 
 
 # --- Medication Selection Tabs ---
-med_tab1, med_tab2 = st.tabs(["Ibuprofen", "Acetaminophen"])
-is_ibuprofen = True # Default to true, will be changed in acetaminophen tab
+# Use a callback to track the active tab
+def on_tab_change():
+    st.session_state.active_tab = st.session_state.tabs
 
-with med_tab1:
+tabs = st.tabs(["Ibuprofen", "Acetaminophen"])
+if "active_tab" not in st.session_state:
+    st.session_state.active_tab = "Ibuprofen"
+
+with tabs[0]: # Ibuprofen
     age_range = st.radio(
         "Child's Age",
         ["> 6 months", "≤ 6 months"],
@@ -100,22 +133,19 @@ with med_tab1:
         ["Children's Liquid (100 mg / 5 mL)", "Infant Drops (200 mg / 5 mL)"],
         key='ibu_form'
     )
-    # This tab is selected, so we calculate for Ibuprofen
-    if 'active_tab' not in st.session_state or st.session_state.active_tab == 'Acetaminophen':
-        is_ibuprofen = True
-        st.session_state.active_tab = 'Ibuprofen'
+    if st.session_state.active_tab != "Ibuprofen":
+        st.session_state.active_tab = "Ibuprofen"
 
 
-with med_tab2:
+with tabs[1]: # Acetaminophen
     ace_formulation_option = st.selectbox(
         "Acetaminophen Formulation",
         ["Children's Liquid (160 mg / 5 mL)", "Infant Drops (80 mg / 1 mL)"],
         key='ace_form'
     )
-    # This tab is selected, so we calculate for Acetaminophen
-    if 'active_tab' not in st.session_state or st.session_state.active_tab == 'Ibuprofen':
-        is_ibuprofen = False
-        st.session_state.active_tab = 'Acetaminophen'
+    if st.session_state.active_tab != "Acetaminophen":
+        st.session_state.active_tab = "Acetaminophen"
+
 
 # --- Calculation Logic & Display ---
 if st.button("Calculate Dose", use_container_width=True):
@@ -171,5 +201,4 @@ st.markdown("""
     Always consult with a qualified healthcare provider for medical advice and before administering any medication.
 </div>
 """, unsafe_allow_html=True)
-
 

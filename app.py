@@ -29,9 +29,10 @@ medication = st.radio("Select Medication", ["Ibuprofen", "Acetaminophen"], horiz
 # --- Conditional Inputs based on Medication Selection ---
 if medication == "Ibuprofen":
     st.subheader("Ibuprofen Details")
+    # Corrected the labels to match the medical chart exactly
     age_range = st.radio(
         "Child's Age",
-        ["Older than 6 months", "≤ 6 months"],
+        ["Over 6 months", "1 to 6 months"], 
         horizontal=True
     )
     formulation_option = st.selectbox(
@@ -67,8 +68,13 @@ if st.button("Calculate Dose", use_container_width=True):
                 total_mg, total_ml, timing, dose_rate, concentration_text = 0, 0, "", 0, ""
 
                 if medication == 'Ibuprofen':
-                    dose_rate = 10 if age_range == '> 6 months' else 5
-                    timing = 'every 6 hours as needed' if age_range == '> 6 months' else 'every 8 hours as needed'
+                    # Corrected the logic to match the new, precise labels
+                    if age_range == 'Over 6 months':
+                        dose_rate = 10
+                        timing = 'every 6 hours as needed'
+                    else: # '1-6 months'
+                        dose_rate = 5
+                        timing = 'every 8 hours as needed'
                     
                     if "100 mg / 5 mL" in formulation_option:
                         concentration_text = "100 mg / 5 mL"

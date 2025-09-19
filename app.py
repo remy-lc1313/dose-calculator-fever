@@ -16,7 +16,8 @@ st.divider()
 
 col1, col2 = st.columns([3, 1])
 with col1:
-    weight = st.number_input("Child's Weight", min_value=0.1, step=0.1, format="%.1f")
+    # Changed to a placeholder instead of a default value
+    weight_input = st.text_input("Child's Weight", placeholder="Enter weight here")
 with col2:
     # Adding a little space for alignment
     st.write("")
@@ -50,52 +51,61 @@ st.divider()
 
 # --- Calculation Logic & Display ---
 if st.button("Calculate Dose", use_container_width=True):
-    if not weight or weight <= 0:
-        st.error("Please enter a valid weight.")
-    else:
-        # Convert weight to kg if necessary
-        weight_in_kg = weight if weight_unit == 'kg' else weight / 2.20462
+    try:
+        # Check if input is not empty before converting
+        if not weight_input:
+            st.error("Please enter a weight.")
+        else:
+            weight = float(weight_input) # Convert text input to a number
+            if weight <= 0:
+                st.error("Please enter a weight greater than 0.")
+            else:
+                # Convert weight to kg if necessary
+                weight_in_kg = weight if weight_unit == 'kg' else weight / 2.20462
 
-        # Initialize variables
-        total_mg, total_ml, timing, dose_rate, concentration_text = 0, 0, "", 0, ""
+                # Initialize variables
+                total_mg, total_ml, timing, dose_rate, concentration_text = 0, 0, "", 0, ""
 
-        if medication == 'Ibuprofen':
-            dose_rate = 10 if age_range == '> 6 months' else 5
-            timing = 'every 6 hours as needed' if age_range == '> 6 months' else 'every 8 hours as needed'
+                if medication == 'Ibuprofen':
+                    dose_rate = 10 if age_range == '> 6 months' else 5
+                    timing = 'every 6 hours as needed' if age_range == '> 6 months' else 'every 8 hours as needed'
+                    
+                    if "100 mg / 5 mL" in formulation_option:
+                        concentration_text = "100 mg / 5 mL"
+                        concentration = 100 / 5
+                    else:
+                        concentration_text = "200 mg / 5 mL"
+                        concentration = 200 / 5
+                
+                else: # Acetaminophen
+                    dose_rate = 15
+                    timing = 'every 4 hours as needed'
+
+                    if "160 mg / 5 mL" in formulation_option:
+                        concentration_text = "160 mg / 5 mL"
+                        concentration = 160 / 5
+                    else:
+                        concentration_text = "80 mg / 1 mL"
+                        concentration = 80 / 1
+
+                # Perform calculations
+                total_mg = weight_in_kg * dose_rate
+                total_ml = total_mg / concentration
+
+                # --- Display Result using clean Streamlit components ---
+                st.subheader("Recommended Dose:")
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric(label="Dose (in mg)", value=f"{total_mg:.0f} mg")
+                with col2:
+                    st.metric(label="Dose (in mL)", value=f"{total_ml:.1f} mL")
+
+                st.info(f"Give {timing}.")
+                st.caption(f"Calculation based on: {dose_rate} mg/kg for a child of {weight_in_kg:.1f} kg using {concentration_text} concentration.")
             
-            if "100 mg / 5 mL" in formulation_option:
-                concentration_text = "100 mg / 5 mL"
-                concentration = 100 / 5
-            else:
-                concentration_text = "200 mg / 5 mL"
-                concentration = 200 / 5
-        
-        else: # Acetaminophen
-            dose_rate = 15
-            timing = 'every 4 hours as needed'
-
-            if "160 mg / 5 mL" in formulation_option:
-                concentration_text = "160 mg / 5 mL"
-                concentration = 160 / 5
-            else:
-                concentration_text = "80 mg / 1 mL"
-                concentration = 80 / 1
-
-        # Perform calculations
-        total_mg = weight_in_kg * dose_rate
-        total_ml = total_mg / concentration
-
-        # --- Display Result using clean Streamlit components ---
-        st.subheader("Recommended Dose:")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric(label="Dose (in mg)", value=f"{total_mg:.0f} mg")
-        with col2:
-            st.metric(label="Dose (in mL)", value=f"{total_ml:.1f} mL")
-
-        st.info(f"Give {timing}.")
-        st.caption(f"Calculation based on: {dose_rate} mg/kg for a child of {weight_in_kg:.1f} kg using {concentration_text} concentration.")
+    except ValueError:
+        st.error("Please enter a valid number for the weight.")
 
 
 # --- Disclaimer ---

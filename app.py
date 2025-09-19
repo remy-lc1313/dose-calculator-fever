@@ -7,94 +7,96 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- Custom Styling (More Robust for Streamlit Cloud) ---
+# --- Custom Styling (Bright & Cheerful) ---
 st.markdown("""
     <style>
         /* Import custom fonts */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Quicksand:wght@700&display=swap');
 
-        /* Main background color */
+        /* Main background with gradient */
         .stApp {
-            background-color: #14b8a6; /* Saturated Teal */
-            font-family: 'Inter', sans-serif; /* Set default font for the whole app */
+            background: linear-gradient(135deg, #f9a8d4, #facc15, #4ade80, #38bdf8);
+            font-family: 'Inter', sans-serif;
         }
-        
+
         /* Main container for widgets */
         .main .block-container {
             background-color: #ffffff;
             border-radius: 1rem;
             padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         /* Title styling */
         h1 {
             font-family: 'Quicksand', sans-serif;
             text-align: center;
-            color: #0f766e; /* Darker Teal */
+            color: #1e293b;
         }
         h2 {
             font-family: 'Quicksand', sans-serif;
             text-align: center;
             font-weight: 700;
-            color: #475569; /* Slate Gray */
+            color: #334155;
         }
         
-        /* --- FONT SIZE & READABILITY IMPROVEMENTS (STABLE SELECTORS) --- */
+        /* --- FONT SIZE IMPROVEMENTS --- */
 
-        /* Increase font size for all input widget labels */
+        /* Widget labels (like "Child’s Age") */
         div[data-testid="stWidgetLabel"] p {
-             font-size: 1.25rem; /* INCREASED */
-             color: #334155;
-             font-weight: 600;
+             font-size: 1.4rem !important;
+             color: #2563eb !important; /* Bright Blue */
+             font-weight: 700 !important;
         }
         
-        /* Increase font size for text inside selectbox */
+        /* Selectbox text */
         div[data-testid="stSelectbox"] div {
-             font-size: 1.2rem; /* INCREASED */
+             font-size: 1.2rem !important;
         }
 
-        /* Increase font size for text inside radio buttons */
+        /* Radio options */
         div[data-testid="stRadio"] label {
-             font-size: 1.15rem; /* INCREASED */
+             font-size: 1.2rem !important;
+             font-weight: 600;
+             border-radius: 0.5rem;
+             padding: 0.5rem 0.75rem;
+             margin-right: 0.5rem;
+             border: 2px solid transparent;
+             transition: all 0.2s;
         }
-        
-        /* Increase font size for number input */
-        div[data-testid="stNumberInput"] input {
-             font-size: 1.2rem; /* INCREASED */
+        div[data-testid="stRadio"] label:has(input:checked) {
+            border-color: #f97316 !important; /* Vibrant Orange */
+            background-color: #fff7ed !important; /* Light Orange */
+            color: #000 !important;
         }
-        
-        /* --- END FONT IMPROVEMENTS --- */
 
-
-        /* Style for the radio button options to give a colorful feel on selection */
-        .stRadio [role="radiogroup"] > label {
-            background-color: #f1f5f9; /* Light gray background for options */
+        /* Tabs */
+        .stTabs [role="tablist"] > div {
+            font-size: 1.3rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            padding: 0.5rem 1rem;
             border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            margin-right: 0.5rem;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            transition: background-color 0.3s;
         }
-        /* Style for the SELECTED radio button */
-         .stRadio [role="radiogroup"] > label:has(input:checked) {
-            border-color: #f97316; /* Bright Orange Border */
-            background-color: #fff7ed; /* Light Orange Background */
-         }
+        .stTabs [role="tablist"] > div[aria-selected="true"] {
+            background-color: #facc15 !important; /* Bright Yellow */
+            color: #000 !important;
+        }
 
-        /* Style for the main Calculate button */
+        /* Bright Calculate button */
         .stButton>button {
             border: none;
             border-radius: 0.75rem;
             padding: 0.75rem 1.5rem;
-            background-color: #0d9488;
+            background-color: #f97316; /* Bright Orange */
             color: white;
             font-weight: bold;
             transition: background-color 0.2s;
-            font-size: 1.2rem; /* INCREASED */
+            font-size: 1.3rem !important;
         }
         .stButton>button:hover {
-            background-color: #0f766e;
+            background-color: #ea580c; /* Darker Orange */
         }
     </style>
     """, unsafe_allow_html=True)
@@ -114,7 +116,6 @@ with col2:
 
 
 # --- Medication Selection Tabs ---
-# Use session state to track the active tab robustly
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "Ibuprofen"
 
@@ -145,7 +146,6 @@ with tabs[1]: # Acetaminophen
 
 # --- Calculation Logic & Display ---
 if st.button("Calculate Dose", use_container_width=True):
-    # Determine which medication is active based on the last known state of the tabs
     active_tab_on_click = st.session_state.get('active_tab', 'Ibuprofen')
     
     if not weight or weight <= 0:
@@ -155,7 +155,6 @@ if st.button("Calculate Dose", use_container_width=True):
         
         total_mg, total_ml, timing, dose_rate, med_name, concentration_text = 0, 0, "", 0, "", ""
         
-        # This logic determines which tab's data to use based on the session_state flag
         if active_tab_on_click == 'Ibuprofen':
             med_name = "Ibuprofen"
             dose_rate = 10 if st.session_state.ibu_age == '> 6 months' else 5
@@ -177,14 +176,14 @@ if st.button("Calculate Dose", use_container_width=True):
             total_mg = weight_in_kg * dose_rate
             total_ml = total_mg / concentration
 
-        # --- Display Result ---
+        # --- Display Result (Brightened Box) ---
         st.success("Calculation Complete!")
         st.markdown(f"""
-        <div style="text-align: center; padding: 1rem; background-color: #f3f4f6; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
-            <p style="font-size: 1.4rem; font-weight: bold; color: #f97316;">{total_mg:.0f} mg</p>
-            <p style="font-size: 2.2rem; font-weight: bold; color: #0ea5e9;">{total_ml:.1f} mL</p>
-            <p style="font-weight: 600; color: #4b5563; font-size: 1.1rem;">{timing}</p>
-            <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+        <div style="text-align: center; padding: 1rem; background-color: #fff7ed; border-radius: 0.75rem; border: 3px solid #facc15;">
+            <p style="font-size: 1.6rem; font-weight: bold; color: #f97316;">{total_mg:.0f} mg</p>
+            <p style="font-size: 2.4rem; font-weight: bold; color: #2563eb;">{total_ml:.1f} mL</p>
+            <p style="font-weight: 600; color: #4b5563; font-size: 1.2rem;">{timing}</p>
+            <p style="font-size: 1rem; color: #6b7280; margin-top: 0.5rem;">
                 ({med_name} @ {dose_rate} mg/kg for {concentration_text})
             </p>
         </div>
@@ -193,9 +192,8 @@ if st.button("Calculate Dose", use_container_width=True):
 
 # --- Disclaimer ---
 st.markdown("""
-<div style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: #4b5563;">
+<div style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #4b5563;">
     <strong>Disclaimer:</strong> This tool is for informational purposes only. 
     Always consult with a qualified healthcare provider for medical advice and before administering any medication.
 </div>
 """, unsafe_allow_html=True)
-

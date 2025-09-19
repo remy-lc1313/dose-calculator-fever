@@ -7,7 +7,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- Custom Styling (Bright & Cheerful) ---
+# --- Custom Styling (Bright, Cheerful + Bigger Fonts) ---
 st.markdown("""
     <style>
         /* Import custom fonts */
@@ -32,31 +32,46 @@ st.markdown("""
             font-family: 'Quicksand', sans-serif;
             text-align: center;
             color: #1e293b;
+            font-size: 2.8rem !important;
         }
         h2 {
             font-family: 'Quicksand', sans-serif;
             text-align: center;
             font-weight: 700;
             color: #334155;
+            font-size: 2rem !important;
         }
-        
-        /* --- FONT SIZE IMPROVEMENTS --- */
 
-        /* Widget labels (like "Child’s Age") */
+        /* ----------------- GLOBAL FONT OVERRIDE ----------------- */
+        html, body, [class*="css"] {
+            font-size: 18px !important;
+        }
+
+        .stMarkdown p, .stMarkdown, .stMarkdown span, .stMarkdown li {
+            font-size: 18px !important;
+            line-height: 1.6 !important;
+        }
+
+        .stTabs [role="tab"] {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+        }
+
         div[data-testid="stWidgetLabel"] p {
-             font-size: 1.4rem !important;
-             color: #2563eb !important; /* Bright Blue */
-             font-weight: 700 !important;
-        }
-        
-        /* Selectbox text */
-        div[data-testid="stSelectbox"] div {
-             font-size: 1.2rem !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #2563eb !important; /* Bright Blue */
         }
 
-        /* Radio options */
+        div[data-testid="stRadio"] label,
+        div[data-testid="stSelectbox"] div,
+        div[data-testid="stNumberInput"] input {
+            font-size: 18px !important;
+        }
+        /* -------------------------------------------------------- */
+
+        /* Radio options (styling + cheerful highlight) */
         div[data-testid="stRadio"] label {
-             font-size: 1.2rem !important;
              font-weight: 600;
              border-radius: 0.5rem;
              padding: 0.5rem 0.75rem;
@@ -65,20 +80,12 @@ st.markdown("""
              transition: all 0.2s;
         }
         div[data-testid="stRadio"] label:has(input:checked) {
-            border-color: #f97316 !important; /* Vibrant Orange */
-            background-color: #fff7ed !important; /* Light Orange */
+            border-color: #f97316 !important;
+            background-color: #fff7ed !important;
             color: #000 !important;
         }
 
-        /* Tabs */
-        .stTabs [role="tablist"] > div {
-            font-size: 1.3rem !important;
-            font-weight: 700 !important;
-            color: #1e293b !important;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s;
-        }
+        /* Tabs cheerful highlight */
         .stTabs [role="tablist"] > div[aria-selected="true"] {
             background-color: #facc15 !important; /* Bright Yellow */
             color: #000 !important;
@@ -192,7 +199,7 @@ if st.button("Calculate Dose", use_container_width=True):
 
 # --- Disclaimer ---
 st.markdown("""
-<div style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #4b5563;">
+<div style="text-align: center; margin-top: 2rem; font-size: 1rem; color: #4b5563;">
     <strong>Disclaimer:</strong> This tool is for informational purposes only. 
     Always consult with a qualified healthcare provider for medical advice and before administering any medication.
 </div>

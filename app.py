@@ -11,7 +11,7 @@ st.set_page_config(
 st.markdown("""
     <style>
         /* Import custom fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Quicksand:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Quicksand:wght@700&display=swap');
 
         /* Main background color */
         .stApp {
@@ -44,24 +44,24 @@ st.markdown("""
 
         /* Increase font size for all input widget labels */
         div[data-testid="stWidgetLabel"] p {
-             font-size: 1.1rem;
+             font-size: 1.25rem; /* INCREASED */
              color: #334155;
              font-weight: 600;
         }
         
         /* Increase font size for text inside selectbox */
         div[data-testid="stSelectbox"] div {
-             font-size: 1.1rem;
+             font-size: 1.2rem; /* INCREASED */
         }
 
         /* Increase font size for text inside radio buttons */
         div[data-testid="stRadio"] label {
-             font-size: 1.05rem;
+             font-size: 1.15rem; /* INCREASED */
         }
         
         /* Increase font size for number input */
         div[data-testid="stNumberInput"] input {
-             font-size: 1.1rem;
+             font-size: 1.2rem; /* INCREASED */
         }
         
         /* --- END FONT IMPROVEMENTS --- */
@@ -91,7 +91,7 @@ st.markdown("""
             color: white;
             font-weight: bold;
             transition: background-color 0.2s;
-            font-size: 1.1rem; /* Increased font size for button */
+            font-size: 1.2rem; /* INCREASED */
         }
         .stButton>button:hover {
             background-color: #0f766e;
@@ -146,7 +146,6 @@ with tabs[1]: # Acetaminophen
 # --- Calculation Logic & Display ---
 if st.button("Calculate Dose", use_container_width=True):
     # Determine which medication is active based on the last known state of the tabs
-    # We need to re-read the state inside the button press
     active_tab_on_click = st.session_state.get('active_tab', 'Ibuprofen')
     
     if not weight or weight <= 0:
@@ -156,17 +155,8 @@ if st.button("Calculate Dose", use_container_width=True):
         
         total_mg, total_ml, timing, dose_rate, med_name, concentration_text = 0, 0, "", 0, "", ""
         
-        # A simple hack to re-check which tab is visually active
-        # This part is tricky in Streamlit. We determine active med by what selectbox has a value
-        try:
-            # This will throw an error if the key doesn't exist (because the tab wasn't rendered yet)
-            _ = st.session_state.ace_form 
-            active_med = 'Acetaminophen'
-        except:
-            active_med = 'Ibuprofen'
-
-
-        if active_med == 'Ibuprofen':
+        # This logic determines which tab's data to use based on the session_state flag
+        if active_tab_on_click == 'Ibuprofen':
             med_name = "Ibuprofen"
             dose_rate = 10 if st.session_state.ibu_age == '> 6 months' else 5
             timing = 'every 6 hours' if st.session_state.ibu_age == '> 6 months' else 'every 8 hours'
@@ -191,10 +181,10 @@ if st.button("Calculate Dose", use_container_width=True):
         st.success("Calculation Complete!")
         st.markdown(f"""
         <div style="text-align: center; padding: 1rem; background-color: #f3f4f6; border-radius: 0.5rem; border: 2px solid #e5e7eb;">
-            <p style="font-size: 1.2rem; font-weight: bold; color: #f97316;">{total_mg:.0f} mg</p>
-            <p style="font-size: 2rem; font-weight: bold; color: #0ea5e9;">{total_ml:.1f} mL</p>
-            <p style="font-weight: 600; color: #4b5563;">{timing}</p>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 0.5rem;">
+            <p style="font-size: 1.4rem; font-weight: bold; color: #f97316;">{total_mg:.0f} mg</p>
+            <p style="font-size: 2.2rem; font-weight: bold; color: #0ea5e9;">{total_ml:.1f} mL</p>
+            <p style="font-weight: 600; color: #4b5563; font-size: 1.1rem;">{timing}</p>
+            <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
                 ({med_name} @ {dose_rate} mg/kg for {concentration_text})
             </p>
         </div>
@@ -203,7 +193,7 @@ if st.button("Calculate Dose", use_container_width=True):
 
 # --- Disclaimer ---
 st.markdown("""
-<div style="text-align: center; margin-top: 2rem; font-size: 0.75rem; color: #4b5563;">
+<div style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: #4b5563;">
     <strong>Disclaimer:</strong> This tool is for informational purposes only. 
     Always consult with a qualified healthcare provider for medical advice and before administering any medication.
 </div>
